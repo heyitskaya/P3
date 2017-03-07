@@ -1,0 +1,61 @@
+body {
+    background-color: #077;
+}
+.body{
+    margin:40px auto;
+    max-width:600pt;
+    line-height:1.6;
+    font-size:18px;
+    padding:0 10px
+}
+h1,h2,h3{
+    line-height:1.2;
+    color: white;
+}
+label {
+	display: block;
+}
+span.datetime {
+    margin-right: 10pt;
+    color: #444;
+}
+h1.logo {
+    color: #fff;
+}
+a.none {
+	text-decoration: none;
+	color: #000;
+}
+div.book {
+    border: 1pt solid black;
+    padding: 3pt;
+    margin: 3pt;
+    background-color: #eee;
+}
+.sortButton {
+	display: inline-block;
+	padding: 5pt;
+	margin: 5pt;
+	border-radius: 5pt;
+	background-color: #fff;
+}
+
+.cloud {
+  padding: 5pt;
+  margin: 5pt;
+  border-radius: 5pt;
+  background-color: #fff;
+}
+
+.pageButtons a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 5pt;
+  margin: 5pt;
+  border-radius: 5pt;
+  background-color: #ddd;
+  color: #007777;
+}
+a.currentPage {
+  color: black;
+}
