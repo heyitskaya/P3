@@ -36,17 +36,31 @@ public class Author {
 	public static Comparator<Author> sortByAuthor= new Comparator<Author>() {
 		@Override
 		public int compare(Author lhs, Author rhs) {
-			String left=lhs.lastName;
-			String right=rhs.lastName;
+			String left=lhs.firstName;
+			String right=rhs.firstName;
 			return left.compareTo(right);
 		}
 	};
 	
 	public static Comparator<Author> sortByBirthDate= new Comparator<Author>() {
 		@Override
+		
 		public int compare(Author lhs, Author rhs) {
-			Integer left=lhs.birthDate;
-			Integer right=rhs.birthDate;
+			Integer left;
+			if(lhs.birthDate!=null){
+				left=lhs.birthDate;
+			}
+			else{
+				left=9999;
+			}
+			
+			Integer right;
+			if(rhs.birthDate!=null){
+				right=rhs.birthDate;
+			}
+			else{
+				right=9999;
+			}
 			return left.compareTo(right);
 		}
 	};
@@ -54,20 +68,28 @@ public class Author {
 	public static Comparator<Author> sortByDeathDate= new Comparator<Author>() {
 		@Override
 		public int compare(Author lhs, Author rhs) {
-			Integer left=lhs.deathDate;
-			Integer right=rhs.deathDate;
+			Integer left;
+			if(lhs.deathDate!=null){
+				left=lhs.deathDate;
+			}
+			else{
+				left=9999;
+			}
+			
+			Integer right;
+			if(rhs.deathDate!=null){
+				right=rhs.deathDate;
+			}
+			else{
+				right=9999;
+			}
 			return left.compareTo(right);
 		}
 	};
 	
-/**	public static Comparator<Author> sortByTitle= new Comparator<Author>() {
-		@Override
-		public int compare(Author lhs, Author rhs) {
-			String left=lhs.lastName;
-			String right=rhs.lastName;
-			return left.compareTo(right);
-		}
-	}; **/
+	
+	
+	
 	
 	
 	

@@ -63,7 +63,6 @@ public class HTMLView {
 			printSearchForm(html);
 			//added this
 			html.println("<h3>Browse books by author</h3>");
-
 			for(char letter = 'A'; letter <= 'Z'; letter++) {
 				html.println("<a href='/author/"+letter+"'>"+letter+"</a> ");
 			}
@@ -96,30 +95,50 @@ public class HTMLView {
 			printBookHTML(html, book);
 			printPageEnd(html);
 		}
+		//automatically 
 	}
 	
 	private void printAuthorHTML(PrintWriter html, Author author){
-		//kaya
 		html.println("<div class='author'>");
-		html.println("<a class='none' href='/book/"+author.fullName+"'>");
+		String lastName=author.lastName;
+		String firstName=author.firstName;
+		////localhost:1234/author?last=Franz&first=Kafka
+		
+		html.println("<a class='none' href='/author/?last="+lastName +"&first="+firstName+"'>");
 		html.println("<div class='fullName'>"+author.fullName+"</div>");
 		//html.println("<div>Popularity: "+author.popularity+"</div>");
 		html.println("<div>Birthdate: "+author.birthDate+"</div>");
 		html.println("<div>Deathdate: "+author.deathDate+"</div");
+		int booksWritten=author.books.size();
+		html.println("<div>Books written by this author: "+booksWritten+"</div>");
 		html.println("<div>Popularity: "+author.popularity+"</div");
+		
+		
 		//create a new url with the author in it
 		//HashMap<String,String> map= new HashMap<String,String>();
 		//map.add("")
 		
-		html.println("<a href='"+author.getAuthorURL()+"'>Check out books by this author</a>");
+		
 		html.println("</div>");
 		html.println("</div");
 		
 	}
 	
-	
+	public void printBooksBySingleAuthor(PrintWriter html, Author author){
+		if(author!=null && author.books!=null){
+			List<GutenbergBook> books=author.books;
+			System.out.println("books this person wrote "+books.size());
+			if(books!=null&& books.size()!=0){
+				for(GutenbergBook b:books){
+					//this brings to another link, maybe write another one?
+					printBookHTML(html,b);
+				}
+			}
+	}
+	}
 
 	private void printBookHTML(PrintWriter html, GutenbergBook book) {
+		
 		html.println("<div class='book'>");
 		html.println("<a class='none' href='/book/"+book.id+"'>");
 		html.println("<div class='title'>"+book.title+"</div>");
@@ -160,6 +179,12 @@ public class HTMLView {
 		else if(sortHow.equals("author")) {
 			Collections.sort(theBooks, Author.sortByAuthor);
 		} 
+		else if(sortHow.equals("birthdate")){
+			Collections.sort(theBooks,Author.sortByBirthDate);
+		}
+		else if(sortHow.equals("deathdate")){
+			Collections.sort(theBooks,Author.sortByDeathDate);
+		}
 		else {
 			req.resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad Sort.");
 			return;
@@ -167,11 +192,9 @@ public class HTMLView {
 		String pageStr = req.getParameter("p", "1");
 		int whichPage = Integer.parseInt(pageStr);
 		int zeroBasedPage = whichPage-1;
-
 		// calculate how many total pages there will be for theBooks with pageSize.
 		// Math.ceil means round up.
 		int totalPages = (int) Math.ceil(theBooks.size() / (double) pageSize);
-
 		if (zeroBasedPage != 0) { // don't say bad page number for no results!
 			if (zeroBasedPage < 0 || zeroBasedPage >= totalPages) {
 				req.resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad page number.");
@@ -181,7 +204,7 @@ public class HTMLView {
 		try (PrintWriter html = req.resp.getWriter()) {
 			printPageStart(html, "Bookz: "+pageTitle);
 			//removed title
-			for (String field : Arrays.asList("author", "popular")) {
+			for (String field : Arrays.asList("author", "popular","birthdate","deathdate")) {
 				boolean shouldLink = !sortHow.equals(field);
 				
 				html.println("<div class='sortButton'>");
@@ -189,7 +212,8 @@ public class HTMLView {
 					// copy any pageArgs if present
 					HashMap<String, String> linkArgs = new HashMap<>(pageArgs);
 					linkArgs.put("sort", field);
-
+					System.out.println("field "+linkArgs.get("sort"));
+					
 					html.println("<a href='"+Util.encodeParametersInURL(linkArgs, req.getURL())+"'>");
 					html.println("Sort by "+Util.capitalize(field));
 					html.println("</a>");

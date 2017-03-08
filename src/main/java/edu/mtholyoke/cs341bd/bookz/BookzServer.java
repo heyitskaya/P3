@@ -1,5 +1,7 @@
 package edu.mtholyoke.cs341bd.bookz;
-
+import java.util. *;
+//localhost:1234/author?last=Franz&first=Kafka
+//localhost:1234/author/Franz/Kafka
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -88,9 +90,6 @@ public class BookzServer extends AbstractHandler {
 			throws IOException, ServletException {
 		Map<String,String[]> map= req.getParameterMap();
 		
-		
-		
-		
 		ServerRequest request = new ServerRequest(req, resp);
 		System.out.println(request);
 
@@ -103,11 +102,9 @@ public class BookzServer extends AbstractHandler {
 			try (PrintWriter out = request.resp.getWriter()) {
 				out.println("/reported");
 			}
-
 			// done.
 			return;
 		}
-
 		// Our server only supports GET methods.
 		if (!"GET".equals(request.method)) {
 			return;
@@ -136,7 +133,6 @@ public class BookzServer extends AbstractHandler {
 			view.showBookCollection(model.searchBooks(query), request, "Books matching '"+query+"'", params);
 			return;
 		}
-
 		// Title pages
 		String titleCmd = Util.getAfterIfStartsWith("/title/", path);
 		if(titleCmd != null) {
@@ -146,18 +142,40 @@ public class BookzServer extends AbstractHandler {
 		}
 		String authorCmd=Util.getAfterIfStartsWith("/author/",path);
 		System.out.println("authorCmd "+authorCmd);
-		if(authorCmd!=null){
+		if(authorCmd!=null && authorCmd.length()!=0){ //might not be null but might also be empty
 			//get the first letter
 			char firstChar=authorCmd.charAt(0);
 			view.showBookCollectionByAuthor(this.model.getAuthorStartingWith(firstChar),request,"Authors starting with",Collections.emptyMap());
 		}
-
 		// Per-book pages
 		String bookId = Util.getAfterIfStartsWith("/book/", path);
 		if(bookId != null) {
 			view.showBookPage(this.model.getBook(bookId), resp);
 			return;
 		}
+		
+		//only gonna check when there's an author
+		if(path.startsWith("/author")) {
+			String firstName=Util.join(map.get("first"));
+			String lastName=Util.join(map.get("last"));
+			//System.out.println("")
+			//first last
+			HashMap<ArrayList<String>,Author> authorLibrary=model.authorLibrary;
+			ArrayList<String> fullName= new ArrayList<String>();
+			fullName.add(lastName);
+			fullName.add(firstName);
+			System.out.println("fullName "+fullName);
+			
+			Author currAuthor=authorLibrary.get(fullName);
+			if(currAuthor!=null){
+				PrintWriter html = resp.getWriter();
+				view.printBooksBySingleAuthor(html,currAuthor);
+				html.close();
+			}
+		}
+		
+				
+		
 
 		// Front page!
 		if ("/front".equals(path) || "/".equals(path)) {
@@ -165,4 +183,30 @@ public class BookzServer extends AbstractHandler {
 			return;
 		}
 	}
+	
+	//book <--->user defined as string
+	//book has a set of users
+	//users have a set of books
+	//login form only has username, turn username into a cookie give it to brower and browser sends it to us anytime
+	
+	//recommend only keeping track of one set
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

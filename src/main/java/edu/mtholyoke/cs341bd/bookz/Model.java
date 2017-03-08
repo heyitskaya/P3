@@ -27,12 +27,9 @@ public class Model {
 		for(ArrayList<String> name:authorLibrary.keySet()){
 			Author currAuthor=authorLibrary.get(name);
 			List<GutenbergBook> booksByAuthor=currAuthor.books;
-			
 			//given a list of books find the popularity
 			int pop=findPopularity(booksByAuthor);
-			
 			currAuthor.popularity=pop;
-			System.out.println("currAuthor.popularity "+currAuthor.popularity);
 			
 		}
 	}
@@ -74,8 +71,6 @@ public class Model {
 					Integer[] birthAndDeathDate=getBirthAndDeathDate(creator);
 					birthDate=birthAndDeathDate[0];
 					deathDate=birthAndDeathDate[1];
-					System.out.println("creator "+creator);
-					System.out.println("birth and death are "+Arrays.toString(birthAndDeathDate));
 					fullName.add(lastName);
 					fullName.add(firstName); //lastName, firstName
 				}
@@ -124,7 +119,6 @@ public class Model {
 			
 			String dates=array[array.length-1];
 			dates.replace("?", "");
-			System.out.println("dates "+dates);
 			
 			if(dates.contains("-")){
 				String[] birthAndDeath=dates.split("-");
@@ -153,22 +147,12 @@ public class Model {
 						else{
 							answer[1]=null;
 						}
-					
 				}
-				/**else if(birthAndDeath.length==1){ //when its less than 2
-					String birth=birthAndDeath[0];
-					String trimBirth=birth.trim();
-					answer[0]=Integer.parseInt(trimBirth);
-					
-				} **/
-				
-				
 			}
 			else{ //do sth
 				
 				return answer;
 			}
-			
 			return answer;
 		}
 		
@@ -242,9 +226,7 @@ public class Model {
 	
 	//kaya
 	public List<Author> getAuthorStartingWith(char firstLetter){
-		
-		System.out.println("authorLibrary size"+authorLibrary.keySet().size());
-		System.out.println("firstLetter "+firstLetter);
+	
 		char query=Character.toLowerCase(firstLetter);
 		List<Author> matches= new ArrayList<Author>();
 		for(ArrayList<String> nameList:authorLibrary.keySet()){
@@ -252,15 +234,12 @@ public class Model {
 			String lastName = nameList.get(1);
 			if(lastName!=null){
 				if(lastName.length()!=0){
-					System.out.println("query "+query);
-					System.out.println("lastNameFirstLetter "+Character.toLowerCase(lastName.charAt(0)));
 				if(Character.toLowerCase(lastName.charAt(0))==query){
 					matches.add(authorLibrary.get(nameList)); //add the author
 				}
 				}
 			}
 		}
-		System.out.println("length of authors starting with char "+matches.size());
 		return matches;
 		
 		
