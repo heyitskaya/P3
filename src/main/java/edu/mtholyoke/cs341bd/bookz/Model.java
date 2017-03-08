@@ -18,7 +18,38 @@ public class Model {
 		// do the hard work:
 		DataImport.loadJSONBooks(library);
 		authorLibrary=createAuthorLibrary(library);
+		//after creating author library we want to go in and set the popularity
+		initPopularityInAuthorLibrary();
 		loadReportedBooks();
+	}
+	
+	public void initPopularityInAuthorLibrary(){
+		for(ArrayList<String> name:authorLibrary.keySet()){
+			Author currAuthor=authorLibrary.get(name);
+			List<GutenbergBook> booksByAuthor=currAuthor.books;
+			
+			//given a list of books find the popularity
+			int pop=findPopularity(booksByAuthor);
+			
+			currAuthor.popularity=pop;
+			System.out.println("currAuthor.popularity "+currAuthor.popularity);
+			
+		}
+	}
+	
+	//given a list of books find the popularity
+	public int findPopularity(List<GutenbergBook> listOfBooks){
+		if(!listOfBooks.isEmpty())
+		{
+			int pop=0;
+			for(GutenbergBook book:listOfBooks){
+				pop+=book.downloads;
+			}
+			return pop/listOfBooks.size(); //find the mean downloads
+		}
+		else{
+			return 0;
+		}
 	}
 	
 	//please let this not be wrong
@@ -27,7 +58,6 @@ public class Model {
 				GutenbergBook book=library.get(id); //get the Gutenberg book
 				//extract first and last name
 				String creator=book.creator;
-				
 				ArrayList<String> fullName= new ArrayList<String>();
 				String firstName;
 				String lastName;
@@ -57,7 +87,6 @@ public class Model {
 					authorLibrary.put(fullName, new Author(fullName.get(0),fullName.get(1),fullName,birthDate,deathDate)); //remember to initialize some fields in the author class
 				}
 			}
-			
 			return authorLibrary;
 		}
 		
@@ -76,29 +105,7 @@ public class Model {
 			}
 			return ""; //if there is none we just return empty string
 		}
-		
-	/**	public Integer getBirthDate(String creator){
-			if(creator!=null && creator.length()!=0){
-				String[] array=creator.split(",");
-				array=trimWhiteSpaceInArray(array); //trim the whitespace
-				Integer num=Integer.MAX_VALUE;
-				for(String s:array){
-					if(isInteger(s)){ 
-						Integer temp=Integer.parseInt(s);
-						if(temp>num){
-							num=temp; //always setting it to the smallest thing
-						}
-					}
-				}
-				return num;
-			}
-			else{ //when it doesn't have a creator field
-				return 0;
-			}
-			
-			
-		}
-		**/
+	
 		public boolean isInteger(String s){
 			try{
 				Integer.parseInt(s);
@@ -108,26 +115,7 @@ public class Model {
 				return false;
 			}
 		}
-	/**	public Integer getDeathDate(String creator){
-			Integer deathDate=Integer.MIN_VALUE;
-			if(creator!=null && creator.length()!=0){
-				String[] array=creator.split(",");
-				System.out.println("what does my array look like ");
-				System.out.println(Arrays.toString(array));
-				array=trimWhiteSpaceInArray(array); //trim whitespace
-				for(String s:array){
-					if(isInteger(s)){ //if s can be converted to an integer
-						Integer tempInteger=Integer.parseInt(s);
-						if(tempInteger<deathDate){
-							deathDate=tempInteger;
-						}
-					}
-				}
-				return deathDate;
-			}
-			return 0;
-		}  **/
-		
+	
 		public Integer[] getBirthAndDeathDate(String creator){
 			
 			Integer[] answer= new Integer[2];

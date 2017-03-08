@@ -103,9 +103,15 @@ public class HTMLView {
 		html.println("<div class='author'>");
 		html.println("<a class='none' href='/book/"+author.fullName+"'>");
 		html.println("<div class='fullName'>"+author.fullName+"</div>");
-		html.println("<div>Popularity: "+author.popularity+"</div>");
+		//html.println("<div>Popularity: "+author.popularity+"</div>");
 		html.println("<div>Birthdate: "+author.birthDate+"</div>");
 		html.println("<div>Deathdate: "+author.deathDate+"</div");
+		html.println("<div>Popularity: "+author.popularity+"</div");
+		//create a new url with the author in it
+		//HashMap<String,String> map= new HashMap<String,String>();
+		//map.add("")
+		
+		html.println("<a href='"+author.getAuthorURL()+"'>Check out books by this author</a>");
 		html.println("</div>");
 		html.println("</div");
 		
@@ -172,11 +178,10 @@ public class HTMLView {
 				return;
 			}
 		}
-
-		
 		try (PrintWriter html = req.resp.getWriter()) {
 			printPageStart(html, "Bookz: "+pageTitle);
-			for (String field : Arrays.asList("title", "author", "popular")) {
+			//removed title
+			for (String field : Arrays.asList("author", "popular")) {
 				boolean shouldLink = !sortHow.equals(field);
 				
 				html.println("<div class='sortButton'>");

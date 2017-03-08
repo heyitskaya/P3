@@ -32,6 +32,12 @@ div.book {
     margin: 3pt;
     background-color: #eee;
 }
+div.author {
+    border: 1pt solid black;
+    padding: 3pt;
+    margin: 3pt;
+    background-color: #eee;
+}
 .sortButton {
 	display: inline-block;
 	padding: 5pt;
