@@ -19,6 +19,8 @@ public class GutenbergBook {
 	public List<String> libraryOfCongressSubjectCode = new ArrayList<>();
 	public int downloads;
 	public boolean reported = false;
+	public int numLikes;
+	public ArrayList<String> usersLiked= new ArrayList<String>();
 
 	public int getBookNumber() {
 		return Integer.parseInt(Objects.requireNonNull(Util.getAfterIfStartsWith("etext", id)));

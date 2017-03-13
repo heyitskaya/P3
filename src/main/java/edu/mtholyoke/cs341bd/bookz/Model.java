@@ -11,7 +11,7 @@ public class Model {
 	Map<String, GutenbergBook> library;
 	public Set<String> reported;
 	HashMap<ArrayList<String>,Author> authorLibrary= new HashMap<ArrayList<String>,Author>();
-
+	ArrayList<GutenbergBook> booksLiked= new ArrayList<GutenbergBook>();
 	public Model() throws IOException {
 		// start with an empty hash-map; tell it it's going to be big in advance:
 		library = new HashMap<>(40000);
@@ -64,7 +64,6 @@ public class Model {
 					//we extract whatever is after by
 				}
 				else{
-					
 					firstName=getFirstName(creator).trim();
 					lastName=getLastName(creator).trim();
 					Integer[] dates=getBirthAndDeathDate(creator);
@@ -74,7 +73,6 @@ public class Model {
 					fullName.add(lastName);
 					fullName.add(firstName); //lastName, firstName
 				}
-				
 				if(authorLibrary.keySet()!=null && authorLibrary.keySet().contains(fullName)){ //if the fullName is already a key
 					authorLibrary.get(fullName).books.add(book); //add this book as a book the author has written
 				}
@@ -150,7 +148,6 @@ public class Model {
 				}
 			}
 			else{ //do sth
-				
 				return answer;
 			}
 			return answer;
@@ -187,7 +184,6 @@ public class Model {
 			throw new RuntimeException(e);
 		} ;
 	}
-
 	private void saveReportedBooks() {
 		try (PrintWriter writer = new PrintWriter(reportedFile)) {
 			for (String bookId : reported) {

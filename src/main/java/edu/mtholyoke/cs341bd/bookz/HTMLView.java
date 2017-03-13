@@ -1,6 +1,9 @@
 package edu.mtholyoke.cs341bd.bookz;
-
+import javax.servlet.http.Cookie. *;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -22,6 +25,8 @@ public class HTMLView {
 	 * @param title
 	 *            the title of the page, since that goes in the header.
 	 */
+	
+	
 	void printPageStart(PrintWriter html, String title) {
 		html.println("<!DOCTYPE html>"); // HTML5
 		html.println("<html>");
@@ -56,10 +61,85 @@ public class HTMLView {
 		html.println("<input type='submit' value='Go!' />");
 		html.println("</form>");
 	}
+	
+	public void logIn(){
+		System.out.println("you're logging in ");
+	}
+	public void printLogin(PrintWriter html){
+		html.println("<form action='/login' method='POST'>");
+		html.println("<label>Username: ");
+		html.println("<input type=\"text\" name=\"user\"> <br>");
+		html.println("<input type='submit' value='Login' />");
+		html.println("</label>");
+		html.println("</form>");
+	}
+	
+	public void printLogout(PrintWriter html){
+		html.println("<form action='/logout' method='POST'>");
+		html.println("<label>Username: ");
+		html.println("<input type='submit' value='Logout' />");
+		html.println("</label>");
+		html.println("</form>");
+	}
+	
+	public void displayLikesPage(HttpServletResponse resp, ArrayList<GutenbergBook> booksLiked) throws IOException{
+		System.out.println("NUM BOOKS LIKED "+booksLiked.size());
+		try (PrintWriter html = resp.getWriter()) //put try catch outside of forloop
+		{	
+			printPageStart(html, "Likes"); 
+			for(GutenbergBook book:booksLiked){
+		
+				System.out.println("for loop");
+				
+					String numLikes=Integer.toString(book.numLikes);
+					String usersLiked=book.usersLiked.toString();
+					/**
+					html.println("<div class='book'>");
+					html.println("<a class='none' href='/book/"+book.id+"'>");
+					html.println("<div class='title'>"+book.title+"</div>");
+					if(book.creator != null) {
+						html.println("<div class='creator'>" + book.creator + "</div>");
+					}
+					html.println("<div>Downloads: "+book.downloads+"</div>");
+					html.println("<a href='"+book.getGutenbergURL()+"'>On Project Gutenberg</a>");
+					html.println("<h5> "+"Number of likes" +numLikes+"</h5>");
+					html.println("<h5>" +"Users who liked this book"+ usersLiked+ "</h5>");
+					// TODO, finish up fields.
+					html.println("</a>");
+					html.println("</div>");
+					html.close(); **/
+					printBookHTML(html,book);
+					html.println("<h5> "+"Number of likes" +numLikes+"</h5>");
+					html.println("<h5>" +"Users who liked this book"+ usersLiked+ "</h5>");
+				
+				
+				}
+			printPageEnd(html); 
+			}
+	}
 
-	void showFrontPage(Model model, HttpServletResponse resp) throws IOException {
+	void showFrontPage(Model model, HttpServletResponse resp,ServerRequest req) throws IOException {
+		Cookie userCookie = req.getCookie("user");
+		String currentUser = null;
+		if(userCookie != null) {
+			currentUser = userCookie.getValue();
+		}
+		
 		try (PrintWriter html = resp.getWriter()) {
-			printPageStart(html, "Bookz");
+			
+			printPageStart(html,"Settings");
+			
+			html.println("<div class='cloud'>");
+			if(currentUser == null) {
+				//print login form
+				printLogin(html);
+			
+			} else {
+				//print logout form
+				printLogout(html);
+			}
+			html.println("</div>");
+			printPageEnd(html);
 			printSearchForm(html);
 			//added this
 			html.println("<h3>Browse books by author</h3>");
@@ -68,23 +148,19 @@ public class HTMLView {
 			}
 			//go to the model and get the authors
 			html.println("<h3>Browse books by title</h3>");
-
 			for(char letter = 'A'; letter <= 'Z'; letter++) {
 				html.println("<a href='/title/"+letter+"'>"+letter+"</a> ");
 			}
-
 			// get 5 random books:
 			html.println("<h3>Check out these random books</h3>");
 			List<GutenbergBook> randomBooks = model.getRandomBooks(5);
 			for (GutenbergBook randomBook : randomBooks) {
 				printBookHTML(html, randomBook);
 			}
-
 			// if reported?
 			if(model.reported.size() > 0) {
 				html.println("<div class='cloud'><a href='/reported'>Books that have been reported</a></div>");
 			}
-
 			printPageEnd(html);
 		}
 	}
@@ -95,6 +171,7 @@ public class HTMLView {
 			printBookHTML(html, book);
 			printPageEnd(html);
 		}
+		
 		//automatically 
 	}
 	
@@ -103,10 +180,10 @@ public class HTMLView {
 		String lastName=author.lastName;
 		String firstName=author.firstName;
 		////localhost:1234/author?last=Franz&first=Kafka
+	
 		
 		html.println("<a class='none' href='/author/?last="+lastName +"&first="+firstName+"'>");
 		html.println("<div class='fullName'>"+author.fullName+"</div>");
-		//html.println("<div>Popularity: "+author.popularity+"</div>");
 		html.println("<div>Birthdate: "+author.birthDate+"</div>");
 		html.println("<div>Deathdate: "+author.deathDate+"</div");
 		int booksWritten=author.books.size();
@@ -117,28 +194,38 @@ public class HTMLView {
 		//create a new url with the author in it
 		//HashMap<String,String> map= new HashMap<String,String>();
 		//map.add("")
-		
-		
 		html.println("</div>");
 		html.println("</div");
-		
 	}
-	
 	public void printBooksBySingleAuthor(PrintWriter html, Author author){
 		if(author!=null && author.books!=null){
 			List<GutenbergBook> books=author.books;
-			System.out.println("books this person wrote "+books.size());
 			if(books!=null&& books.size()!=0){
 				for(GutenbergBook b:books){
 					//this brings to another link, maybe write another one?
 					printBookHTML(html,b);
 				}
 			}
+		}
 	}
+	public void printLogoutConfirmation(PrintWriter html){
+		html.println("<h1>you are logged out </h1>");
+		html.close();
 	}
-
+	
+	public void printLoginConfirmation(PrintWriter html){
+		html.println("<h1>You are logged in</h1>");
+		html.close(); //have to close it
+	}
+	public void printLikedConfirmation(PrintWriter html, GutenbergBook book){
+		System.out.println("in confirmation");
+		html.println("<h1>Thank you for liking this book</h1>");
+		//liking sth sends us cookies
+		//get user from the cookie and
+		book.numLikes++; //increment the likes
+		html.close();
+	}
 	private void printBookHTML(PrintWriter html, GutenbergBook book) {
-		
 		html.println("<div class='book'>");
 		html.println("<a class='none' href='/book/"+book.id+"'>");
 		html.println("<div class='title'>"+book.title+"</div>");
@@ -149,7 +236,15 @@ public class HTMLView {
 		html.println("<a href='"+book.getGutenbergURL()+"'>On Project Gutenberg</a>");
 		// TODO, finish up fields.
 		html.println("</a>");
-
+		//like button
+		//inlcude in url book id want to increment
+		//parameter map
+		html.println("<form action='/like' method='POST'>");
+		html.println("<input type='hidden' value='" + book.id + "' name='book' />");
+		html.println("<input type='submit' value='Like' />");
+		html.println("</form>");
+		
+		
 		if(book.reported) {
 			html.println("<div class='error'>This catalog entry has some error.</div>");
 		} else {
@@ -159,12 +254,9 @@ public class HTMLView {
 			html.println("<input type='submit' value='Report Error' />");
 			html.println("</form>");
 		}
-
 		html.println("</div>");
 	}
-
 	public static int pageSize = 20;
-	
 	//only sort by popularity and sort by author first name
 	public void showBookCollectionByAuthor(List<Author> theBooks, ServerRequest req, String pageTitle, Map<String, String> pageArgs) throws IOException {
 		// get the sort parameter so we know how to sort.
@@ -212,7 +304,6 @@ public class HTMLView {
 					// copy any pageArgs if present
 					HashMap<String, String> linkArgs = new HashMap<>(pageArgs);
 					linkArgs.put("sort", field);
-					System.out.println("field "+linkArgs.get("sort"));
 					
 					html.println("<a href='"+Util.encodeParametersInURL(linkArgs, req.getURL())+"'>");
 					html.println("Sort by "+Util.capitalize(field));
