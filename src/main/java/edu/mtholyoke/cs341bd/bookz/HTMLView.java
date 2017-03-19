@@ -82,17 +82,17 @@ public class HTMLView {
 		html.println("</form>");
 	}
 	
-	public void displayLikesPage(HttpServletResponse resp, ArrayList<GutenbergBook> booksLiked) throws IOException{
+	public void displayLikesPage(HttpServletResponse resp, HashSet<GutenbergBook> booksLiked) throws IOException{
 		System.out.println("NUM BOOKS LIKED "+booksLiked.size());
 		try (PrintWriter html = resp.getWriter()) //put try catch outside of forloop
 		{	
 			printPageStart(html, "Likes"); 
 			for(GutenbergBook book:booksLiked){
-		
-				System.out.println("for loop");
-				
+				//GutenbergBook currBook=library.get(book);
 					String numLikes=Integer.toString(book.numLikes);
+					System.out.println("numLikes "+numLikes);
 					String usersLiked=book.usersLiked.toString();
+					
 					/**
 					html.println("<div class='book'>");
 					html.println("<a class='none' href='/book/"+book.id+"'>");
@@ -161,6 +161,8 @@ public class HTMLView {
 			if(model.reported.size() > 0) {
 				html.println("<div class='cloud'><a href='/reported'>Books that have been reported</a></div>");
 			}
+			//books liked crap
+			//html.println("<a class='cloud' href='/like'> See what books have been liked</a></div>");
 			printPageEnd(html);
 		}
 	}

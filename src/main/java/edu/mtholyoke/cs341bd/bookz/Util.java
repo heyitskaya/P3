@@ -38,7 +38,6 @@ public class Util {
 		String yyyymmdd = localDateTime.getYear() + "-" + localDateTime.getMonth().getValue() + "-"
 				+ localDateTime.getDayOfMonth();
 		String hhmm = String.format("%02d:%02d", localDateTime.getHour(), localDateTime.getMinute());
-
 		return yyyymmdd + " " + hhmm;
 	}
 

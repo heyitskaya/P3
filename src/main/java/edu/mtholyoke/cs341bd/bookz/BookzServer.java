@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Map;
-//About like button, when clicked it gets sent to another page that displays how many ppl
-//have liked it and books that you've liked
-//it does not get printed with the book html
+//A great system extracts authors from the title (e.g. after the word by) if not available in the creator field.
 /**
  * @author jfoley
  */
@@ -125,6 +123,8 @@ public class BookzServer extends AbstractHandler {
 			String userName=Util.join(map.get("user"));
 			request.sendCookie(new Cookie("user", userName));
 			view.printLoginConfirmation(request.resp.getWriter());
+			//logout
+			
 		
 		}
 		if("/logout".equals(path)){ //if the user is attempting to log out
@@ -132,26 +132,29 @@ public class BookzServer extends AbstractHandler {
 			
 		}
 		if("/like".equals(path) ){ //and method is post
-			//	public void printLikedConfirmation(PrintWriter html, GutenbergBook book)
 			String bookID=Util.join(map.get("book"));
 			GutenbergBook book=model.library.get(bookID);
-			
 			if(request.hasCookie("user")){
+				
 				Cookie userCookie=request.getCookie("user"); 
-				book.numLikes++;
-				String userName=userCookie.getValue();
-				//after getting the user name
-				model.booksLiked.add(book); //add it to the list of books liked
-				//go to a page that shows who has liked it
-				book.usersLiked.add(userName);
-				ArrayList<GutenbergBook> booksLiked=model.booksLiked;
-				System.out.println("booksLiked "+booksLiked.toString());
-				view.displayLikesPage(resp, model.booksLiked);
+				if(book!=null){
+					String userName=userCookie.getValue();
+					//after getting the user name
+					book.usersLiked.add(userName); //add users name
+					
+					book.numLikes=book.usersLiked.size();
+					HashSet<GutenbergBook> booksLiked=model.booksLiked;
+					model.likeBook(bookID); 
+					view.displayLikesPage(resp, model.booksLiked);
+					
+					
+				}
+			
+				
+				
 			}
 			else{ //when it doesnt have that cookie we send them to the login page
 				//restart
-				
-				
 			}
 		}
 		

@@ -46,7 +46,6 @@ public class DataImport {
           book.uploaded = json.getString("created");
           book.downloads = json.getInt("downloads");
           book.creator = getOrNull(json,"creator");
-
           JSONArray subjects = json.getJSONArray("subjects");
           for (int i = 0; i < subjects.length(); i++) {
             String[] subj = subjects.getString(i).split("\t");
@@ -56,7 +55,6 @@ public class DataImport {
               book.libraryOfCongressSubjectHeading.add(subj[1]);
             }
           }
-
           JSONArray kblinks = json.getJSONArray("kblinks");
           for (int i = 0; i < kblinks.length(); i++) {
             book.maybeWikipedias.add(kblinks.getString(i));

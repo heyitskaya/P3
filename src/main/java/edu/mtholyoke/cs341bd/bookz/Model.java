@@ -3,15 +3,22 @@ package edu.mtholyoke.cs341bd.bookz;
 import java.io.*;
 import java.util.*;
 
+import javax.servlet.http.Cookie;
+
 //import src.main.java.edu.mtholyoke.cs341bd.bookz.Author;
 //import src.main.java.edu.mtholyoke.cs341bd.bookz.GutenbergBook;
 
 public class Model {
 	public static File reportedFile = new File("reported");
+	public static File booksLikedFile= new File("booksLiked2");
+	public static File usersLikedFile= new File("usersLiked");
+
+	
 	Map<String, GutenbergBook> library;
 	public Set<String> reported;
 	HashMap<ArrayList<String>,Author> authorLibrary= new HashMap<ArrayList<String>,Author>();
-	ArrayList<GutenbergBook> booksLiked= new ArrayList<GutenbergBook>();
+	HashSet<GutenbergBook> booksLiked;
+	HashSet<String> booksLikedID;
 	public Model() throws IOException {
 		// start with an empty hash-map; tell it it's going to be big in advance:
 		library = new HashMap<>(40000);
@@ -19,18 +26,20 @@ public class Model {
 		DataImport.loadJSONBooks(library);
 		authorLibrary=createAuthorLibrary(library);
 		//after creating author library we want to go in and set the popularity
+		//booksLikedFile.delete();
+		//usersLikedFile.delete();
 		initPopularityInAuthorLibrary();
+		loadLikedBooks();
+		System.out.println("bookLikedID size "+booksLikedID.size());
+		System.out.println("booksLiked size "+booksLiked.size());
 		loadReportedBooks();
 	}
-	
 	public void initPopularityInAuthorLibrary(){
 		for(ArrayList<String> name:authorLibrary.keySet()){
 			Author currAuthor=authorLibrary.get(name);
 			List<GutenbergBook> booksByAuthor=currAuthor.books;
-			//given a list of books find the popularity
 			int pop=findPopularity(booksByAuthor);
 			currAuthor.popularity=pop;
-			
 		}
 	}
 	
@@ -48,7 +57,6 @@ public class Model {
 			return 0;
 		}
 	}
-	
 	//please let this not be wrong
 		public HashMap<ArrayList<String>, Author> createAuthorLibrary(Map<String,GutenbergBook> library){
 			for(String id:library.keySet()){
@@ -82,7 +90,6 @@ public class Model {
 			}
 			return authorLibrary;
 		}
-		
 		//look at this again
 		public String getFirstName(String creator){
 			String[] array=creator.split(",");
@@ -98,7 +105,6 @@ public class Model {
 			}
 			return ""; //if there is none we just return empty string
 		}
-	
 		public boolean isInteger(String s){
 			try{
 				Integer.parseInt(s);
@@ -110,29 +116,18 @@ public class Model {
 		}
 	
 		public Integer[] getBirthAndDeathDate(String creator){
-			
 			Integer[] answer= new Integer[2];
 			String[] array=creator.split(",");
-			
-			
 			String dates=array[array.length-1];
 			dates.replace("?", "");
-			
 			if(dates.contains("-")){
 				String[] birthAndDeath=dates.split("-");
-				
-			
 				birthAndDeath=trimWhiteSpaceInArray(birthAndDeath);
-			
 				if(birthAndDeath.length>=2){
-					
 						String birth=birthAndDeath[0];
 						String death=birthAndDeath[1];
-						
 						String trimBirth=birth.trim();
 						String trimDeath=death.trim();
-						
-					
 						if(isInteger(trimBirth)){
 							answer[0]=Integer.parseInt(trimBirth);
 						}
@@ -152,7 +147,6 @@ public class Model {
 			}
 			return answer;
 		}
-		
 		public String[] trimWhiteSpaceInArray(String[] array){
 			if(array!=null){
 				for(String s:array){
@@ -162,6 +156,99 @@ public class Model {
 			}
 			return array;
 		}
+	private void loadLikedBooks(){
+		this.booksLiked= new HashSet<>();
+		this.booksLikedID= new HashSet<>();
+		try(BufferedReader reader1 = new BufferedReader(new FileReader(booksLikedFile))){
+			try(BufferedReader reader2= new BufferedReader(new FileReader(usersLikedFile))){
+				while(true){
+					String line1= reader1.readLine();
+					//String line2=reader2.readLine();
+					System.out.println("line1 "+line1);
+					//System.out.println("line2 "+line2);
+					
+					if(line1==null) break;
+					//if(line2==null) break;
+					String id=line1.trim();
+					
+					//String stringOfUsers=line2.trim();
+					
+				//	ArrayList<String> listOfUsers=turnStringToArrayList(stringOfUsers);
+					
+					GutenbergBook book=library.get(id);
+					if(book!=null){
+						book.liked=true;
+						booksLiked.add(library.get(id));
+						booksLikedID.add(id);
+					//	book.usersLiked=listOfUsers;
+					}
+				}
+			}
+		}
+		catch(FileNotFoundException e){
+			
+		}catch(IOException e){
+			throw new RuntimeException(e);
+		};
+	}
+	
+/**	private void saveLikedBooks(){
+		try (PrintWriter writer = new PrintWriter(booksLikedFile)) {
+			for (GutenbergBook bookId : booksLiked) {
+				writer.println(bookId);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	} 
+	**/
+/**	private void loadSavedBooks() {
+		try (BufferedReader reader1 = new BufferedReader(new FileReader(booksLikedFile))) 
+		{
+			try(BufferedReader reader2= new BufferedReader(new FileReader(usersLikedFile)))
+			{
+				while(true) 
+				{
+					String line1 = reader1.readLine(); //book id
+					System.out.println("line1 "+line1);
+					String line2 = reader2.readLine(); // users who have liked this book
+					System.out.println("line2 "+line2);
+					if(line1 == null) break;
+					if(line2==null) break;
+					String id = line1.trim();
+					String stringOfUsers=line2.trim();
+					//if(stringOfUsers.length()!=0){
+						ArrayList<String> listOfUsers=turnStringToArrayList(stringOfUsers);
+					//}
+					// only load ids if they're really books:
+					GutenbergBook book = library.get(id);
+					if(book != null) 
+					{
+						book.liked = true;
+						booksLikedID.add(id);
+						booksLiked.add(library.get(id));
+						book.usersLiked=listOfUsers;
+						book.numLikes=listOfUsers.size();
+					}
+				}
+			}
+	
+		}
+		
+		catch (FileNotFoundException e) {
+			// not an error, nothing yet.
+		} 
+		catch (IOException e) {
+			// Crash!
+			throw new RuntimeException(e);
+		} ;
+	} 
+	**/
+	public ArrayList<String > turnStringToArrayList(String s){
+		ArrayList<String> myList = new ArrayList<String>(Arrays.asList(s.split(" ")));
+		return myList;
+	}
+	
 
 	private void loadReportedBooks() {
 		this.reported = new HashSet<>();
@@ -183,6 +270,42 @@ public class Model {
 			// Crash!
 			throw new RuntimeException(e);
 		} ;
+	}
+	
+	private void saveLikedBooks(){
+		try(PrintWriter writer1= new PrintWriter(booksLikedFile)){
+			
+			for(String bookId:booksLikedID){
+				writer1.println(bookId);
+				
+				ArrayList<String> usersLiked=library.get(bookId).usersLiked;
+				
+				
+				try(PrintWriter writer2= new PrintWriter(usersLikedFile)){
+					System.out.println("saveLikedBooks usrsLiked tostring "+usersLiked.toString());
+					
+					writer2.println(usersLiked.toString());
+				} catch(FileNotFoundException e){
+					throw new RuntimeException(e);
+				}
+			}
+		} catch(FileNotFoundException e){
+			throw new RuntimeException(e);
+		}
+	}
+	
+	//kaya
+	public void likeBook(String id){
+		
+		//GutenbergBook book = library.get(id);
+		if(library.get(id) != null) {
+			//library.get(id).numLikes++;
+			library.get(id).liked = true;
+			booksLikedID.add(id);
+			booksLiked.add(library.get(id)); //add the book to our HashSet
+			
+			saveLikedBooks();
+		}
 	}
 	private void saveReportedBooks() {
 		try (PrintWriter writer = new PrintWriter(reportedFile)) {
@@ -226,7 +349,6 @@ public class Model {
 		char query=Character.toLowerCase(firstLetter);
 		List<Author> matches= new ArrayList<Author>();
 		for(ArrayList<String> nameList:authorLibrary.keySet()){
-			//System.out.println(nameList);
 			String lastName = nameList.get(1);
 			if(lastName!=null){
 				if(lastName.length()!=0){
@@ -237,8 +359,6 @@ public class Model {
 			}
 		}
 		return matches;
-		
-		
 		
 	}
 
@@ -274,5 +394,19 @@ public class Model {
 		return books;
 	}
 	
+/**	public static void main(String args[]){
+		try{
+			Model m= new Model();
+			String s="kaya ni ranjini john";
+			ArrayList<String> al=m.turnStringToArrayList(s);
+			System.out.println("arrayList" +al.toString());
+			
+		}
+		catch(IOException e){
+		
+		}
+		
+	}
+	**/
 	
 }
