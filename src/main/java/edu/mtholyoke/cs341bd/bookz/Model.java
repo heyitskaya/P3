@@ -3,7 +3,7 @@ package edu.mtholyoke.cs341bd.bookz;
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.http.Cookie;
+//import javax.servlet.http.Cookie;
 
 //import src.main.java.edu.mtholyoke.cs341bd.bookz.Author;
 //import src.main.java.edu.mtholyoke.cs341bd.bookz.GutenbergBook;
@@ -30,8 +30,6 @@ public class Model {
 		//usersLikedFile.delete();
 		initPopularityInAuthorLibrary();
 		loadLikedBooks();
-		System.out.println("bookLikedID size "+booksLikedID.size());
-		System.out.println("booksLiked size "+booksLiked.size());
 		loadReportedBooks();
 	}
 	public void initPopularityInAuthorLibrary(){
@@ -62,7 +60,6 @@ public class Model {
 				GutenbergBook book=library.get(id); //get the Gutenberg book
 				//extract first and last name
 				String creator=book.creator;
-			//	System.out.println(creator);
 				ArrayList<String> fullName= new ArrayList<String>();
 				String firstName;
 				String lastName;
@@ -73,7 +70,7 @@ public class Model {
 					String[] extractedArray=book.longTitle.split("by");
 					String stringWeCareAbout=extractedArray[1].trim();
 					String[] arrayOfNames=stringWeCareAbout.split(" ");
-					//System.out.println("arrayOfNames "+Arrays.toString(arrayOfNames));
+					
 					if(arrayOfNames.length==2){ //its actually a name and not sth else
 						fullName.add(arrayOfNames[0]);
 						fullName.add(arrayOfNames[1]);
@@ -104,21 +101,18 @@ public class Model {
 				else{
 					firstName=getFirstName(creator).trim();
 					lastName=getLastName(creator).trim();
-					Integer[] dates=getBirthAndDeathDate(creator);
+				//	Integer[] dates=getBirthAndDeathDate(creator);
 					Integer[] birthAndDeathDate=getBirthAndDeathDate(creator);
 					birthDate=birthAndDeathDate[0];
 					deathDate=birthAndDeathDate[1];
 					fullName.add(lastName);
 					fullName.add(firstName); //lastName, firstName
-				/**	if(book.id.equals("etext7010")){
-						System.out.println("etext7010 "+fullName.toString());
-					} **/
-					//System.out.println("fullName "+fullName);
+			
 				}
 				if( fullName!=null && authorLibrary.keySet()!=null && authorLibrary.keySet().contains(fullName)){ //if the fullName is already a key
 					authorLibrary.get(fullName).books.add(book); //add this book as a book the author has written
 				}
-				else if(fullName!=null&& fullName.size()!=0/** && fullName.get(0)!=null && fullName.get(1)!=null**/&& authorLibrary.keySet()!=null && !authorLibrary.keySet().contains(fullName)){ //when it's not in the map
+				else if(fullName!=null&& fullName.size()!=0 && authorLibrary.keySet()!=null && !authorLibrary.keySet().contains(fullName)){ //when it's not in the map
 					authorLibrary.put(fullName, new Author(fullName.get(0),fullName.get(1),fullName,birthDate,deathDate)); //remember to initialize some fields in the author class
 				}
 			}
@@ -135,7 +129,6 @@ public class Model {
 			StringBuilder sb= new StringBuilder("");
 			if(s.trim()!=null){
 				char[] array=s.toCharArray(); //split by spaces
-				//System.out.println("help me "+Arrays.toString(array));
 				
 				int size=array.length;
 				for(int i=0;i<size;i++){
@@ -238,24 +231,13 @@ public class Model {
 			try(BufferedReader reader2= new BufferedReader(new FileReader(usersLikedFile))){
 				while(true){
 					String line1= reader1.readLine();
-					//String line2=reader2.readLine();
-					System.out.println("line1 "+line1);
-					//System.out.println("line2 "+line2);
-					
 					if(line1==null) break;
-					//if(line2==null) break;
 					String id=line1.trim();
-					
-					//String stringOfUsers=line2.trim();
-					
-				//	ArrayList<String> listOfUsers=turnStringToArrayList(stringOfUsers);
-					
 					GutenbergBook book=library.get(id);
 					if(book!=null){
 						book.liked=true;
 						booksLiked.add(library.get(id));
 						booksLikedID.add(id);
-					//	book.usersLiked=listOfUsers;
 					}
 				}
 			}
@@ -267,58 +249,7 @@ public class Model {
 		};
 	}
 	
-/**	private void saveLikedBooks(){
-		try (PrintWriter writer = new PrintWriter(booksLikedFile)) {
-			for (GutenbergBook bookId : booksLiked) {
-				writer.println(bookId);
-			}
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	} 
-	**/
-/**	private void loadSavedBooks() {
-		try (BufferedReader reader1 = new BufferedReader(new FileReader(booksLikedFile))) 
-		{
-			try(BufferedReader reader2= new BufferedReader(new FileReader(usersLikedFile)))
-			{
-				while(true) 
-				{
-					String line1 = reader1.readLine(); //book id
-					System.out.println("line1 "+line1);
-					String line2 = reader2.readLine(); // users who have liked this book
-					System.out.println("line2 "+line2);
-					if(line1 == null) break;
-					if(line2==null) break;
-					String id = line1.trim();
-					String stringOfUsers=line2.trim();
-					//if(stringOfUsers.length()!=0){
-						ArrayList<String> listOfUsers=turnStringToArrayList(stringOfUsers);
-					//}
-					// only load ids if they're really books:
-					GutenbergBook book = library.get(id);
-					if(book != null) 
-					{
-						book.liked = true;
-						booksLikedID.add(id);
-						booksLiked.add(library.get(id));
-						book.usersLiked=listOfUsers;
-						book.numLikes=listOfUsers.size();
-					}
-				}
-			}
-	
-		}
-		
-		catch (FileNotFoundException e) {
-			// not an error, nothing yet.
-		} 
-		catch (IOException e) {
-			// Crash!
-			throw new RuntimeException(e);
-		} ;
-	} 
-	**/
+
 	public ArrayList<String > turnStringToArrayList(String s){
 		ArrayList<String> myList = new ArrayList<String>(Arrays.asList(s.split(" ")));
 		return myList;
@@ -357,9 +288,9 @@ public class Model {
 				
 				
 				try(PrintWriter writer2= new PrintWriter(usersLikedFile)){
-					System.out.println("saveLikedBooks usrsLiked tostring "+usersLiked.toString());
 					
 					writer2.println(usersLiked.toString());
+					writer2.close(); 
 				} catch(FileNotFoundException e){
 					throw new RuntimeException(e);
 				}
@@ -468,21 +399,6 @@ public class Model {
 		}
 		return books;
 	}
-	
-	/**public static void main(String args[]){
-		try{
-			Model m= new Model();
-			String s="kaya ni ranjini john";
-			ArrayList<String> al=m.turnStringToArrayList(s);
-			System.out.println("arrayList" +al.toString());
-			int ascii=(int)'-';
-			System.out.println("ASCII "+ascii);
-		}
-		catch(IOException e){
-		
-		}
-		
-	}**/
 	
 	
 }

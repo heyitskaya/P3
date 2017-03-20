@@ -14,11 +14,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+//import java.io.File;
+//import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Map;
-//A great system extracts authors from the title (e.g. after the word by) if not available in the creator field.
 /**
  * @author jfoley
  */
@@ -119,16 +120,11 @@ public class BookzServer extends AbstractHandler {
 		}
 		String path = request.path;
 		if("/login".equals(path)){
-			
 			String userName=Util.join(map.get("user"));
-			
-				request.sendCookie(new Cookie("user", userName));
-				view.printLoginConfirmation(request.resp.getWriter());
-			
-			//logout
+			request.sendCookie(new Cookie("user", userName));
+			view.printLoginConfirmation(request.resp.getWriter());
 		}
 		if("/logout".equals(path)){ //if the user is attempting to log out
-			System.out.println("logout");
 			
 			view.showFrontPage(model, resp,request);
 			
@@ -141,11 +137,10 @@ public class BookzServer extends AbstractHandler {
 				Cookie userCookie=request.getCookie("user"); 
 				if(book!=null){
 					String userName=userCookie.getValue();
-					//after getting the user name
 					book.usersLiked.add(userName); //add users name
 					
+					
 					book.numLikes=book.usersLiked.size();
-					HashSet<GutenbergBook> booksLiked=model.booksLiked;
 					model.likeBook(bookID); 
 					
 					
@@ -157,7 +152,6 @@ public class BookzServer extends AbstractHandler {
 			}
 			else{ //when it doesnt have that cookie we send them to the login page
 				//restart
-				System.out.println("has not logged in yet");
 				view.showFrontPage(model, resp,request);
 			}
 		}

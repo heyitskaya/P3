@@ -1,7 +1,7 @@
 package edu.mtholyoke.cs341bd.bookz;
-import javax.servlet.http.Cookie. *;
+//import javax.servlet.http.Cookie. *;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
@@ -87,6 +87,8 @@ public class HTMLView {
 		try (PrintWriter html = resp.getWriter()) //put try catch outside of forloop
 		{	
 			printPageStart(html, "Likes"); 
+			
+			
 			for(GutenbergBook book:booksLiked){
 				//GutenbergBook currBook=library.get(book);
 					String numLikes=Integer.toString(book.numLikes);
@@ -130,6 +132,7 @@ public class HTMLView {
 			printPageStart(html,"Settings");
 			
 			html.println("<div class='cloud'>");
+		
 			if(currentUser == null) {
 				//print login form
 				printLogin(html);
@@ -162,8 +165,9 @@ public class HTMLView {
 			if(model.reported.size() > 0) {
 				html.println("<div class='cloud'><a href='/reported'>Books that have been reported</a></div>");
 			}
-			//books liked crap
-			//html.println("<a class='cloud' href='/like'> See what books have been liked</a></div>");
+			if(model.booksLiked.size()>0){
+				html.println("<a class='cloud' href='/like'> See what books have been liked</a></div>");
+			}
 			printPageEnd(html);
 		}
 	}
@@ -182,8 +186,6 @@ public class HTMLView {
 		html.println("<div class='author'>");
 		String lastName=author.lastName;
 		String firstName=author.firstName;
-		////localhost:1234/author?last=Franz&first=Kafka
-	
 		
 		html.println("<a class='none' href='/author/?last="+lastName +"&first="+firstName+"'>");
 		html.println("<div class='fullName'>"+author.fullName+"</div>");
@@ -194,9 +196,6 @@ public class HTMLView {
 		html.println("<div>Popularity: "+author.popularity+"</div");
 		
 		
-		//create a new url with the author in it
-		//HashMap<String,String> map= new HashMap<String,String>();
-		//map.add("")
 		html.println("</div>");
 		html.println("</div");
 	}
