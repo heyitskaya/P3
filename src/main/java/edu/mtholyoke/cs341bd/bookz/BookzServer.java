@@ -121,14 +121,15 @@ public class BookzServer extends AbstractHandler {
 		if("/login".equals(path)){
 			
 			String userName=Util.join(map.get("user"));
-			request.sendCookie(new Cookie("user", userName));
-			view.printLoginConfirmation(request.resp.getWriter());
-			//logout
 			
-		
+				request.sendCookie(new Cookie("user", userName));
+				view.printLoginConfirmation(request.resp.getWriter());
+			
+			//logout
 		}
 		if("/logout".equals(path)){ //if the user is attempting to log out
 			System.out.println("logout");
+			
 			view.showFrontPage(model, resp,request);
 			
 		}
@@ -146,16 +147,18 @@ public class BookzServer extends AbstractHandler {
 					book.numLikes=book.usersLiked.size();
 					HashSet<GutenbergBook> booksLiked=model.booksLiked;
 					model.likeBook(bookID); 
-					view.displayLikesPage(resp, model.booksLiked);
+					
 					
 					
 				}
-			
+				view.displayLikesPage(resp, model.booksLiked);
 				
 				
 			}
 			else{ //when it doesnt have that cookie we send them to the login page
 				//restart
+				System.out.println("has not logged in yet");
+				view.showFrontPage(model, resp,request);
 			}
 		}
 		

@@ -69,7 +69,6 @@ public class Model {
 				Integer birthDate=0;
 				Integer deathDate=0;
 				if(book.longTitle.contains("by") && creator.length()==0){
-					//System.out.println("longTitle: "+book.longTitle);
 					//extract what is after by
 					String[] extractedArray=book.longTitle.split("by");
 					String stringWeCareAbout=extractedArray[1].trim();
