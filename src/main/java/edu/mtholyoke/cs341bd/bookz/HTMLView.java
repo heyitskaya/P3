@@ -136,6 +136,7 @@ public class HTMLView {
 			
 			} else {
 				//print logout form
+				//how to destroy a cookie
 				printLogout(html);
 			}
 			html.println("</div>");

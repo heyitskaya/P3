@@ -42,7 +42,6 @@ public class Model {
 			currAuthor.popularity=pop;
 		}
 	}
-	
 	//given a list of books find the popularity
 	public int findPopularity(List<GutenbergBook> listOfBooks){
 		if(!listOfBooks.isEmpty())
@@ -63,13 +62,45 @@ public class Model {
 				GutenbergBook book=library.get(id); //get the Gutenberg book
 				//extract first and last name
 				String creator=book.creator;
+			//	System.out.println(creator);
 				ArrayList<String> fullName= new ArrayList<String>();
 				String firstName;
 				String lastName;
 				Integer birthDate=0;
 				Integer deathDate=0;
-				if(creator==null){
-					//we extract whatever is after by
+				if(book.longTitle.contains("by") && creator.length()==0){
+					//System.out.println("longTitle: "+book.longTitle);
+					//extract what is after by
+					String[] extractedArray=book.longTitle.split("by");
+					String stringWeCareAbout=extractedArray[1].trim();
+					String[] arrayOfNames=stringWeCareAbout.split(" ");
+					//System.out.println("arrayOfNames "+Arrays.toString(arrayOfNames));
+					if(arrayOfNames.length==2){ //its actually a name and not sth else
+						fullName.add(arrayOfNames[0]);
+						fullName.add(arrayOfNames[1]);
+					}
+				}
+				else if(numOccurences('-',creator.trim())>=2){ //we know that it has multiple creators
+					String[] array=creator.trim().split(",");
+					int size=array.length;
+					for(int i=0;i<size;i++){ 
+						//we need to see if a string is a date, if it is a date we get the two entries 
+						//before the date
+						if(isDate(array[i]) && i>=2){ //if s is a date
+							String first=array[i-1]; //first name
+							String last=array[i-2]; //second name	
+							
+							ArrayList<String> name= new ArrayList<String>();
+							name.add(first);
+							name.add(getRidOfDateInString(last));
+							if(authorLibrary.keySet()!=null && authorLibrary.keySet().contains(name)){
+								authorLibrary.get(name).books.add(book);
+							}
+							else if(name!=null&& name.size()!=0/** && fullName.get(0)!=null && fullName.get(1)!=null**/&& authorLibrary.keySet()!=null && !authorLibrary.keySet().contains(name)){ //when it's not in the map
+								authorLibrary.put(name, new Author(name.get(0),name.get(1),name,birthDate,deathDate)); //remember to initialize some fields in the author class
+							}
+						}
+					}
 				}
 				else{
 					firstName=getFirstName(creator).trim();
@@ -80,15 +111,60 @@ public class Model {
 					deathDate=birthAndDeathDate[1];
 					fullName.add(lastName);
 					fullName.add(firstName); //lastName, firstName
+				/**	if(book.id.equals("etext7010")){
+						System.out.println("etext7010 "+fullName.toString());
+					} **/
+					//System.out.println("fullName "+fullName);
 				}
-				if(authorLibrary.keySet()!=null && authorLibrary.keySet().contains(fullName)){ //if the fullName is already a key
+				if( fullName!=null && authorLibrary.keySet()!=null && authorLibrary.keySet().contains(fullName)){ //if the fullName is already a key
 					authorLibrary.get(fullName).books.add(book); //add this book as a book the author has written
 				}
-				else{ //when it's not in the map
+				else if(fullName!=null&& fullName.size()!=0/** && fullName.get(0)!=null && fullName.get(1)!=null**/&& authorLibrary.keySet()!=null && !authorLibrary.keySet().contains(fullName)){ //when it's not in the map
 					authorLibrary.put(fullName, new Author(fullName.get(0),fullName.get(1),fullName,birthDate,deathDate)); //remember to initialize some fields in the author class
 				}
 			}
 			return authorLibrary;
+		}
+		public boolean isDate(String s){
+			if(s!=null && s.contains("-")){
+				return true;
+			}
+			return false;
+		}
+		
+		public String getRidOfDateInString(String s){
+			StringBuilder sb= new StringBuilder("");
+			if(s.trim()!=null){
+				char[] array=s.toCharArray(); //split by spaces
+				//System.out.println("help me "+Arrays.toString(array));
+				
+				int size=array.length;
+				for(int i=0;i<size;i++){
+					int ascii=(int)array[i]; //get the ascii of the char
+					if((ascii<48 && ascii != 45) || ascii> 57){ //if its not a number or a dash
+						sb.append(array[i]);
+						
+					}
+					
+				}
+				return sb.toString().trim();
+			}
+			return null;
+		} 
+		public int numOccurences(char c,String s){
+			int count=0;
+			if(s!=null){
+				char[] array=s.toCharArray();
+				int size=array.length;
+			
+				for(int i=0;i<size;i++){
+					if(array[i]==c && isInteger(String.valueOf(array[i-1]))){
+						count++;
+					}
+				}
+			}
+			return count;
+			
 		}
 		//look at this again
 		public String getFirstName(String creator){
@@ -394,19 +470,20 @@ public class Model {
 		return books;
 	}
 	
-/**	public static void main(String args[]){
+	/**public static void main(String args[]){
 		try{
 			Model m= new Model();
 			String s="kaya ni ranjini john";
 			ArrayList<String> al=m.turnStringToArrayList(s);
 			System.out.println("arrayList" +al.toString());
-			
+			int ascii=(int)'-';
+			System.out.println("ASCII "+ascii);
 		}
 		catch(IOException e){
 		
 		}
 		
-	}
-	**/
+	}**/
+	
 	
 }

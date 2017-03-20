@@ -129,6 +129,7 @@ public class BookzServer extends AbstractHandler {
 		}
 		if("/logout".equals(path)){ //if the user is attempting to log out
 			System.out.println("logout");
+			view.showFrontPage(model, resp,request);
 			
 		}
 		if("/like".equals(path) ){ //and method is post
